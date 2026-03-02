@@ -1697,13 +1697,7 @@ function renderICXMonth(){
 /* ── INIT deferred to after login ── */
 function initDashboard(){} // stub — rendering done in startLoad
 
-</script>
-</div><!-- /#mainApp -->
 
-
-
-
-<script>
 document.addEventListener('DOMContentLoaded', function(){
   // Just show login — dashboard inits after login via startDashboard()
 });

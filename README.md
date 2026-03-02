@@ -1,16 +1,13 @@
 # OKJ P&L Dashboard
 
-## โครงสร้างไฟล์
-```
-index.html       - หน้าหลัก
-config.js        - MGR zones, USERS, branch mapping
-app.js           - ฟังก์ชันทั้งหมด
-css/app.css      - styles
-data/2026-01/    - ข้อมูลเดือน ม.ค. 2026
-  raw.json       - branch summaries
-  dd.json        - P&L detail rows
-  ic.json        - item cost
-```
+## Files
+- `index.html` — หน้า dashboard + CSS
+- `config.js` — MGR zones, branch mapping
+- `data.js` — ข้อมูล P&L รายเดือน (อัปเดตทุกเดือน)
+- `app.js` — ฟังก์ชันทั้งหมด
 
-## เพิ่มข้อมูลเดือนใหม่
-สร้าง folder `data/2026-02/` แล้วใส่ raw.json, dd.json, ic.json
+## GitHub Pages
+Settings → Pages → Deploy from `main` branch, root `/`
+
+## การอัปเดตข้อมูลเดือนใหม่
+เพิ่ม key เดือนใหม่ใน `data.js` → `const MONTHS={...}`

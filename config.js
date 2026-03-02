@@ -7,16 +7,3 @@ const C={b:'#3b82f6',g:'#22c55e',r:'#ef4444',a:'#f59e0b',p:'#a855f7',t:'#06b6d4'
 const SCOL={sales:'#22c55e',cog:'#ef4444',other_cog:'#f97316',col:'#a855f7',sa:'#f59e0b',net:'#3b82f6'};
 
 const SLBL={sales:'📦 Sales & Revenue',cog:'🔴 COG (Food Cost)',other_cog:'🟠 Other COG',col:'🟣 Labour (COL)',sa:'🟡 S&A Expenses',net:'🔵 Net Profit'};
-
-USERS = {
-  'admin':  {pass:'Dome0935969199', zone:'all'},
-  'aoo':    {pass:'aoo1234',        zone:"P'อ้อ"},
-  'jiw':    {pass:'jiw1234',        zone:"P'จิ๋ว"},
-  'moo':    {pass:'moo1234',        zone:"P'หมู"},
-  'tern':   {pass:'tern1234',       zone:"P'เติ้ล"},
-  'sol':    {pass:'sol1234',        zone:"P'ซอล"},
-  'golf':   {pass:'golf1234',       zone:"P'กอล์ฟ"},
-  'aom':    {pass:'aom1234',        zone:"P'อ้อม"},
-  'toey':   {pass:'toey1234',       zone:"P'เตย"},
-  'dome':   {pass:'dome1234',       zone:"P'โดม"},
-};
