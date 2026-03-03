@@ -57,7 +57,7 @@ function switchMonth(key){
 }
 
 function rebuildBranchDropdowns(){
-  ['fBranch','cpA','cpB','dtSel','icBranch'].forEach(id=>{
+  ['fBranch','cpA','cpB','dtSel'].forEach(id=>{
     const sel = document.getElementById(id);
     if(!sel) return;
     const isCpB = id==='cpB';
@@ -224,12 +224,8 @@ function populateDropdowns(){
 
   // IC dropdowns
   const icZone=document.getElementById('icZone');
-  const icBranch=document.getElementById('icBranch');
   if(icZone) Object.keys(MGR).forEach(m=>icZone.appendChild(new Option(m,m)));
-  if(icBranch){
-    icBranch.appendChild(new Option('ทุกสาขา (รวม)', 'all'));
-    ACTIVE.forEach(b=>icBranch.appendChild(new Option(`${b.code} — ${b.name}`,b.code)));
-  }
+  updateICBranchLabel();
 }
 
 /* ── filter ── */
@@ -264,7 +260,9 @@ function applyFilter(){
   renderAll();
   // Update ICX if on that tab
   rebuildICXBranch();
+  updateICBranchLabel();
   if(document.getElementById('tab-icx')?.classList.contains('active')) renderICX();
+  if(document.getElementById('tab-ic')?.classList.contains('active')) renderIC();
 }
 function resetFilter(){
   if(currentUser&&currentUser.zone!=='all'){
@@ -286,7 +284,7 @@ function resetFilter(){
 }
 function renderAll(){
   // Rebuild all branch dropdowns from ACTIVE
-  ['cpA','cpB','dtSel','icBranch'].forEach(id=>{
+  ['cpA','cpB','dtSel'].forEach(id=>{
     const sel=document.getElementById(id);
     if(!sel) return;
     const cur=sel.value;
@@ -771,16 +769,6 @@ function renderMgZone(){
 
 /* ── item cost ── */
 
-function icZoneChange(){
-  const z=document.getElementById('icZone').value;
-  const sel=document.getElementById('icBranch');
-  const cur=sel.value;
-  while(sel.options.length) sel.remove(0);
-  const pool=z==='all'?RAW:RAW.filter(b=>MGR[z]?.includes(b.code));
-  pool.forEach(b=>sel.appendChild(new Option(`${b.code} — ${b.name}`,b.code)));
-  if(pool.find(b=>b.code===cur)) sel.value=cur;
-  renderIC();
-}
 
 let icPieChart=null, icBarChart=null, icSortCol='cost', icSortDir='desc';
 function icSort(col){
@@ -868,8 +856,28 @@ function setStation(val,btn){
   renderICTable();
 }
 
+function getICBranch(){
+  // Returns 'all' if multiple branches active, or single branch code
+  if(!ACTIVE || ACTIVE.length === 0) return 'all';
+  if(ACTIVE.length === 1) return ACTIVE[0].code;
+  return 'all';
+}
+
+function updateICBranchLabel(){
+  const el = document.getElementById('icBranchName');
+  if(!el) return;
+  if(!ACTIVE || ACTIVE.length === 0){ el.textContent = 'ทุกสาขา'; return; }
+  if(ACTIVE.length === 1){
+    el.textContent = `${ACTIVE[0].code} — ${ACTIVE[0].name}`;
+  } else {
+    const zone = document.getElementById('fMgr')?.value;
+    if(zone && zone !== 'all') el.textContent = `${zone} · ${ACTIVE.length} สาขา`;
+    else el.textContent = `ทุกสาขา (${ACTIVE.length} สาขา)`;
+  }
+}
+
 function renderIC(){
-  const code=document.getElementById('icBranch').value;
+  const code=getICBranch();
 
   // Build aggregated IC data when 'all' selected
   let d, s;
@@ -962,16 +970,14 @@ function renderIC(){
       scales:{x:{ticks:{callback:v=>v>=1e3?`฿${(v/1e3).toFixed(0)}K`:''}},y:{ticks:{font:{size:9}},grid:{display:false}}}}
   });
 
-  // Populate station filter chips
-  const stContainer=document.getElementById('icStationChips');
-  stContainer.dataset.active='all';
+  // Populate station list (preserve user's selection)
   const stations=[...new Set(d.items.map(it=>it[6]).filter(Boolean))].sort();
   buildStationDD(stations);
   renderICTable();
 }
 
 function renderICTable(){
-  const code = document.getElementById('icBranch').value;
+  const code = getICBranch();
 
   // Build d for 'all' case
   let d_ic;
@@ -1390,6 +1396,49 @@ function rebuildICXBranch(){
   if(curVal && [...brSel.options].some(o=>o.value===curVal)) brSel.value = curVal;
 }
 
+function buildTiers(monthKey){
+  // Build tiers from selected month's raw data
+  // Tier = group branches where max-min sales <= 500,000
+  const mdata = MONTHS[monthKey];
+  if(!mdata) return [];
+  
+  // Sort branches by sales descending
+  const sorted = [...(mdata.raw||[])].sort((a,b) => b.sales - a.sales);
+  
+  const tiers = [];
+  let tierStart = 0;
+  let i = 0;
+  while(i < sorted.length){
+    const startSales = sorted[i].sales;
+    const tier = [sorted[i]];
+    i++;
+    while(i < sorted.length && (startSales - sorted[i].sales) <= 500000){
+      tier.push(sorted[i]);
+      i++;
+    }
+    tiers.push(tier);
+  }
+  return tiers;
+}
+
+function populateICXTier(monthKey){
+  const sel = document.getElementById('icxTier');
+  if(!sel) return;
+  const curVal = sel.value;
+  while(sel.options.length > 1) sel.remove(1);
+  
+  const tiers = buildTiers(monthKey);
+  tiers.forEach((tier, idx) => {
+    const minS = Math.min(...tier.map(b=>b.sales));
+    const maxS = Math.max(...tier.map(b=>b.sales));
+    const label = `Tier ${idx+1} — ${tier.length} สาขา (฿${(minS/1e6).toFixed(1)}M–${(maxS/1e6).toFixed(1)}M)`;
+    sel.appendChild(new Option(label, idx));
+  });
+  
+  // Restore selection if valid
+  if(curVal !== 'all' && [...sel.options].some(o=>o.value===curVal)) sel.value = curVal;
+}
+
 function setICXViewMode(mode){
   icxViewMode = mode;
   // Toggle buttons
@@ -1415,7 +1464,7 @@ function setICXViewMode(mode){
   renderICX();
 }
 
-function toggleStationDD(){
+function toggleICXStationDD(){
   const dd = document.getElementById('icxStationDD');
   dd.style.display = dd.style.display==='none' ? 'block' : 'none';
 }
@@ -1494,6 +1543,9 @@ function initICX(){
   }
   // Populate branch dropdown for monthly mode - always rebuild to match ACTIVE
   rebuildICXBranch();
+  // Populate tier dropdown
+  const icxMonthEl = document.getElementById('icxMonth');
+  populateICXTier(icxMonthEl?.value || Object.keys(MONTHS).sort()[0]);
   renderICX();
 }
 
@@ -1507,12 +1559,21 @@ function renderICX(){
   if(!mdata) return;
 
   // Get branches: use ACTIVE (respects top filter bar zone/branch selection)
-  // but map to selMonth's raw data for correct sales figures
   const zoneOrder = Object.keys(MGR);
   const activeCodes = new Set(ACTIVE.map(b=>b.code));
+  
+  // Filter by tier if selected
+  const selTier = document.getElementById('icxTier')?.value;
+  let tierCodes = null;
+  if(selTier && selTier !== 'all'){
+    const tiers = buildTiers(selMonth);
+    const tierIdx = parseInt(selTier);
+    if(tiers[tierIdx]) tierCodes = new Set(tiers[tierIdx].map(b=>b.code));
+  }
+  
   const branches = (mdata.raw||[])
-    .filter(b => activeCodes.has(b.code))
-    .sort((a,b) => a.code.localeCompare(b.code));
+    .filter(b => activeCodes.has(b.code) && (!tierCodes || tierCodes.has(b.code)))
+    .sort((a,b) => b.sales - a.sales); // Sort by sales desc within tier
 
   // Get IC data per branch for selected month
   const icData = mdata.ic || {};
