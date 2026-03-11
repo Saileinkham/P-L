@@ -1,5 +1,3 @@
-
-
 /* ── month state ── */
 let curMonth = "2026-01";
 let RAW = MONTHS[curMonth].raw;
@@ -74,7 +72,7 @@ function rebuildBranchDropdowns(){
 }
 
 /* ── helpers ── */
-
+const C={b:'#3b82f6',g:'#22c55e',r:'#ef4444',a:'#f59e0b',p:'#a855f7',t:'#06b6d4',o:'#f97316'};
 const sum=(a,k)=>a.reduce((s,b)=>s+(+b[k]||0),0);
 const avg=(a,k)=>a.length?+(sum(a,k)/a.length).toFixed(1):0;
 const fM=v=>`฿${(v/1e6).toFixed(2)}M`;
@@ -88,7 +86,7 @@ Chart.defaults.font.family='Sarabun'; Chart.defaults.font.size=12;
 Chart.register(ChartDataLabels);
 
 /* ── manager lookup ── */
-
+const BM={};
 Object.entries(MGR).forEach(([m,cs])=>cs.forEach(c=>BM[c]=m));
 
 /* ── filter state ── */
@@ -311,9 +309,9 @@ function renderAll(){
 
 /* ── KPI ── */
 function kCard(lbl,val,sub,chip,ct,color){
-  return `<div class="kpi"><div class="kpib" style="background:${color}"></div><div class="kpil">${lbl}</div><div class="kpiv">${val}</div><div class="kpis">${sub}</div><span class="kchip ${chip}">${ct}</span></div>`;
+  return `${lbl}${val}${sub}${ct}</span>`;
 }
-function insEl(color,txt){return `<div class="ins"><div class="idot" style="background:${color}"></div><span>${txt}</span></div>`;}
+function insEl(color,txt){return `${txt}</span>`;}
 
 function renderKPI(){
   const a=ACTIVE, s=sum(a,'sales')||1;
@@ -341,11 +339,11 @@ function renderKPI(){
   const byRent=[...a].sort((x,y)=>y.rent_pct-x.rent_pct);
   const byElec=[...a].sort((x,y)=>y.elec_pct-x.elec_pct);
   document.getElementById('kInsight').innerHTML=[
-    insEl(C.g,`Best Sales: <strong>${bySales[0]?.name} ${fM(bySales[0]?.sales||0)}</strong>`),
-    insEl(C.g,`Best Net%: <strong>${byNet[0]?.name} ${byNet[0]?.net_pct}%</strong>`),
-    insEl(C.r,`Net Loss: <strong>${a.filter(b=>b.net_profit<0).map(b=>b.name).join(', ')||'ไม่มี'}</strong>`),
-    insEl(C.a,`ค่าเช่าสูงสุด: <strong>${byRent[0]?.name} ${byRent[0]?.rent_pct}%</strong>`),
-    insEl(C.o,`ค่าไฟสูงสุด: <strong>${byElec[0]?.name} ${byElec[0]?.elec_pct}%</strong>`),
+    insEl(C.g,`Best Sales: ${bySales[0]?.name} ${fM(bySales[0]?.sales||0)}</strong>`),
+    insEl(C.g,`Best Net%: ${byNet[0]?.name} ${byNet[0]?.net_pct}%</strong>`),
+    insEl(C.r,`Net Loss: ${a.filter(b=>b.net_profit<0).map(b=>b.name).join(', ')||'ไม่มี'}</strong>`),
+    insEl(C.a,`ค่าเช่าสูงสุด: ${byRent[0]?.name} ${byRent[0]?.rent_pct}%</strong>`),
+    insEl(C.o,`ค่าไฟสูงสุด: ${byElec[0]?.name} ${byElec[0]?.elec_pct}%</strong>`),
   ].join('');
 }
 
@@ -495,16 +493,16 @@ function renderRank(){
       const colors = {cg:'#15803d',ca:'#b45309',cr:'#dc2626',ct:'#6b7280'};
       if(rkShowBaht){
         const display = val==null ? '—' : val>=1e6 ? '฿'+(val/1e6).toFixed(2)+'M' : '฿'+(val/1e3).toFixed(0)+'K';
-        return `<td style="text-align:center;font-size:.92rem;font-weight:700;color:${colors[chip]||'#374151'};letter-spacing:-.01em">${display}</td>`;
+        return `${display}</td>`;
       }
-      return `<td style="text-align:center"><span class="chip ${chip}" style="font-size:.8rem;font-weight:700">${pct==='—'?'—':pct+'%'}</span></td>`;
+      return `${pct==='—'?'—':pct+'%'}</span></td>`;
     };
 
-    return `<tr>
-      <td><div class="rnum ${rk}">${i+1}</div></td>
-      <td><div class="tname">${b.name}</div><div class="tcode">${b.code}</div></td>
-      <td><span class="chip cb" style="font-size:.67rem">${BM[b.code]||'—'}</span></td>
-      <td class="tmono"><div class="brow">${fMx(b.sales)}<div class="mbg"><div class="mb" style="width:${bw}%;background:${b.net_profit>0?C.g:C.r}"></div></div></div></td>
+    return `
+      ${i+1}</td>
+      ${b.name}${b.code}</td>
+      ${BM[b.code]||'—'}</span></td>
+      ${fMx(b.sales)}0?C.g:C.r}"></td>
       ${fmt(b.cog_pct+'',      b.cog,       35, 39)}
       ${fmt(b.fb_pct+'',       b.fb_cog,    30, 35)}
       ${fmt(b.pkg_pct+'',      b.pkg,        1,  2)}
@@ -514,7 +512,7 @@ function renderRank(){
       ${fmt(b.water_pct+'',    b.water,      1,  2)}
       ${fmt(b.elec_pct+'',     b.elec,       3,  6)}
       ${fmt(b.rent_pct+'',     b.rent,       8, 15)}
-      <td></td>
+      </td>
     </tr>`;
   }).join('');
 }
@@ -533,7 +531,7 @@ function renderCmp(){
   const codeA=document.getElementById('cpA').value, codeB=document.getElementById('cpB').value;
   const a=ACTIVE.find(b=>b.code===codeA)||ACTIVE[0], b=ACTIVE.find(b=>b.code===codeB)||ACTIVE[Math.min(1,ACTIVE.length-1)];
   if(!a||!b) return;
-  const tpl=(list)=>`<div class="mrow" style="font-weight:700;border-bottom:2px solid var(--bd)"><div class="mlbl">รายการ</div><div class="mval a">${a.name}</div><div class="mval b">${b.name}</div></div>${list.map(m=>`<div class="mrow"><div class="mlbl">${m.n}</div><div class="mval a">${m.va}</div><div class="mval b">${m.vb}</div></div>`).join('')}`;
+  const tpl=(list)=>`รายการ${a.name}${b.name}${list.map(m=>`${m.n}${m.va}${m.vb}`).join('')}`;
   document.getElementById('cpL').innerHTML=tpl([
     {n:'ยอดขาย',va:fM(a.sales),vb:fM(b.sales)},{n:'Gross Profit',va:fM(a.gp1),vb:fM(b.gp1)},{n:'GP%',va:`${a.gp_pct}%`,vb:`${b.gp_pct}%`},
     {n:'Op Profit',va:fM(a.op_profit),vb:fM(b.op_profit)},{n:'Op%',va:`${a.op_profit_pct}%`,vb:`${b.op_profit_pct}%`},
@@ -568,8 +566,8 @@ function dtZoneChange(){
   renderDt();
 }
 
-
-
+const SCOL={sales:'#22c55e',cog:'#ef4444',other_cog:'#f97316',col:'#a855f7',sa:'#f59e0b',net:'#3b82f6'};
+const SLBL={sales:'📦 Sales & Revenue',cog:'🔴 COG (Food Cost)',other_cog:'🟠 Other COG',col:'🟣 Labour (COL)',sa:'🟡 S&A Expenses',net:'🔵 Net Profit'};
 function setDtMode(m){
   dtMode = m;
   document.getElementById('dtToggleTHB').style.background = m==='thb'?'var(--blue)':'#fff';
@@ -621,24 +619,24 @@ function renderDt(){
   const avgNet  = availMonths.reduce((s,[mk]) => s + (branchByMonth[mk]?.net_pct||0), 0) / availMonths.length;
 
   document.getElementById('dtBadges').innerHTML=[
-    `<span class="dlbadge" style="background:#f0fdf4;color:#16a34a">Sales ${fM(totalSales)}</span>`,
-    `<span class="dlbadge" style="background:#eff4ff;color:#2563eb">GP% ${avgGP.toFixed(2)}%</span>`,
-    `<span class="dlbadge" style="background:#fdf4ff;color:#7c3aed">COL% ${avgCOL.toFixed(2)}%</span>`,
-    `<span class="dlbadge" style="background:#fffbeb;color:#d97706">S&A% ${avgSA.toFixed(2)}%</span>`,
-    `<span class="dlbadge" style="background:#fffbeb;color:#d97706">ค่าเช่า% ${avgRent.toFixed(2)}%</span>`,
-    `<span class="dlbadge" style="background:#fff7ed;color:#ea580c">ค่าไฟ% ${avgElec.toFixed(2)}%</span>`,
-    `<span class="dlbadge" style="background:${avgNet>=20?'#f0fdf4':'#fef2f2'};color:${avgNet>=20?'#16a34a':'#dc2626'}">Net% ${avgNet.toFixed(2)}%</span>`,
-    `<span class="dlbadge" style="background:#f1f5f9;color:#64748b">เขต: ${BM[code]||'—'}</span>`,
-    `<span class="dlbadge" style="background:#f1f5f9;color:#64748b">${availMonths.length} เดือน</span>`,
+    `Sales ${fM(totalSales)}</span>`,
+    `GP% ${avgGP.toFixed(2)}%</span>`,
+    `COL% ${avgCOL.toFixed(2)}%</span>`,
+    `S&A% ${avgSA.toFixed(2)}%</span>`,
+    `ค่าเช่า% ${avgRent.toFixed(2)}%</span>`,
+    `ค่าไฟ% ${avgElec.toFixed(2)}%</span>`,
+    `=20?'#f0fdf4':'#fef2f2'};color:${avgNet>=20?'#16a34a':'#dc2626'}">Net% ${avgNet.toFixed(2)}%</span>`,
+    `เขต: ${BM[code]||'—'}</span>`,
+    `${availMonths.length} เดือน</span>`,
   ].join('');
 
   // Build table header - 12 months + avg
   const thStyle = 'text-align:right;font-size:.7rem;padding:6px 7px;white-space:nowrap';
   const avgLabel = dtMode==='thb' ? 'รวม' : 'เฉลี่ย';
-  let headHtml = `<tr>
-    <th style="width:28%;padding:6px 10px">รายการ</th>
-    ${ALL_MONTHS.map(([mk,ml]) => `<th style="${thStyle};color:${MONTHS[mk]?'var(--t1)':'var(--t3)'}">${ml}</th>`).join('')}
-    <th style="${thStyle};background:#f0f7ff;color:var(--blue);font-weight:700">${avgLabel}</th>
+  let headHtml = `
+    รายการ</th>
+    ${ALL_MONTHS.map(([mk,ml]) => `${ml}</th>`).join('')}
+    ${avgLabel}</th>
   </tr>`;
   document.getElementById('dtHead').innerHTML = headHtml;
 
@@ -649,7 +647,7 @@ function renderDt(){
     if(r.section !== curS){
       curS = r.section;
       const col = SCOL[r.section]||'#64748b', lbl = SLBL[r.section]||r.section;
-      tableHtml += `<tr><td colspan="${14}" style="padding:6px 10px;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${col};background:#f8fafc;border-top:2px solid ${col}40;border-bottom:1px solid var(--bd)">${lbl}</td></tr>`;
+      tableHtml += `${lbl}</td></tr>`;
     }
 
     const col = SCOL[r.section]||'#64748b';
@@ -657,19 +655,19 @@ function renderDt(){
     const rs = r.type==='result' ? 'background:#f8fafc;font-weight:700;border-top:1px solid #cbd5e1'
              : r.type==='header' ? 'background:#f1f5f9;font-weight:700' : '';
 
-    tableHtml += `<tr style="${rs}"><td style="${indent};padding:4px 6px;font-size:.76rem">${r.label}</td>`;
+    tableHtml += `${r.label}</td>`;
 
     // Each month column
     let sumVal = 0, sumPct = 0, cntPct = 0;
     ALL_MONTHS.forEach(([mk]) => {
       const mdd = ddByMonth[mk];
       if(!mdd) {
-        tableHtml += `<td style="text-align:right;font-size:.72rem;color:var(--t3);padding:4px 7px">—</td>`;
+        tableHtml += `—</td>`;
         return;
       }
       const mrow = mdd.rows.find(x => x.label === r.label);
       if(!mrow) {
-        tableHtml += `<td style="text-align:right;font-size:.72rem;color:var(--t3);padding:4px 7px">—</td>`;
+        tableHtml += `—</td>`;
         return;
       }
       sumVal += mrow.val || 0;
@@ -680,7 +678,7 @@ function renderDt(){
       const fv = dtMode==='thb'
         ? (mrow.val===0 ? '—' : (mrow.val<0?'-':'')+'฿'+Math.abs(mrow.val).toLocaleString('en'))
         : (mrow.pct===0 ? '—' : (mrow.pct>0?'+':'')+mrow.pct+'%');
-      tableHtml += `<td style="text-align:right;font-size:.72rem;color:${isNeg?'#dc2626':'inherit'};padding:4px 7px">${fv}</td>`;
+      tableHtml += `${fv}</td>`;
     });
 
     // Avg/sum column
@@ -693,7 +691,7 @@ function renderDt(){
       isNegA = avg < 0;
       avgDisp = avg===0 ? '—' : (avg>0?'+':'')+avg.toFixed(2)+'%';
     }
-    tableHtml += `<td style="text-align:right;font-weight:700;background:#f0f7ff;font-size:.72rem;color:${isNegA?'#dc2626':'var(--blue)'};padding:4px 7px">${avgDisp}</td>`;
+    tableHtml += `${avgDisp}</td>`;
     tableHtml += '</tr>';
   });
 
@@ -718,30 +716,30 @@ function renderMgr(){
   document.getElementById('mgCards').innerHTML=list.map((m,i)=>{
     const rc=['#d97706','#64748b','#b45309'][i]||'#9aa0ad';
     const rb=['#fef3c7','#f1f5f9','#fef2f2'][i]||'#f8f9fb';
-    return `<div class="mgr-card" style="border-top:3px solid ${m.net_pct>=20?C.g:m.net_pct>=10?C.a:C.r}">
-      <div class="mgr-name"><span class="mgr-rank" style="background:${rb};color:${rc}">#${i+1}</span>${m.name}<span style="font-size:.7rem;color:#9aa0ad;font-weight:400">${m.n} สาขา</span></div>
-      <div style="font-size:.8rem;margin-bottom:7px"><span style="color:var(--t2)">Sales: </span><strong>${fM(m.sales)}</strong>&nbsp;&nbsp;<span style="color:var(--t2)">Net: </span><strong style="color:${m.net_pct>=20?C.g:C.r}">${m.net_pct}%</strong></div>
-      <div style="display:flex;gap:5px;flex-wrap:wrap;font-size:.7rem">
-        <span class="kchip ${cc(m.gp_pct,62,65)}">GP ${m.gp_pct}%</span>
-        <span class="kchip ${cc(m.op_profit_pct,20,30)}">Op ${m.op_profit_pct}%</span>
-        <span class="kchip ${m.rent_pct<=8?'cg':m.rent_pct<=15?'ca':'cr'}">เช่า ${m.rent_pct}%</span>
-        <span class="kchip ${m.elec_pct<=3?'cg':m.elec_pct<=6?'ca':'cr'}">ไฟ ${m.elec_pct}%</span>
-      </div>
-    </div>`;
+    return `=20?C.g:m.net_pct>=10?C.a:C.r}">
+      #${i+1}</span>${m.name}${m.n} สาขา</span>
+      Sales: </span>${fM(m.sales)}</strong>&nbsp;&nbsp;Net: </span>=20?C.g:C.r}">${m.net_pct}%</strong>
+      
+        GP ${m.gp_pct}%</span>
+        Op ${m.op_profit_pct}%</span>
+        เช่า ${m.rent_pct}%</span>
+        ไฟ ${m.elec_pct}%</span>
+      
+    `;
   }).join('');
-  document.getElementById('mgBody').innerHTML=list.map((m,i)=>`<tr>
-    <td><div class="rnum ${i===0?'r1':i===1?'r2':i===2?'r3':'rnn'}">${i+1}</div></td>
-    <td><strong>${m.name}</strong></td>
-    <td class="tmono" style="font-size:.7rem">${m.codes.join(', ')}</td>
-    <td class="tmono">${fM(m.sales)}</td>
-    <td><span class="chip ${cc(m.gp_pct,62,65)}">${m.gp_pct}%</span></td>
-    <td><span class="chip ${cc(m.op_profit_pct,20,30)}">${m.op_profit_pct}%</span></td>
-    <td><span class="chip ${m.net_pct<0?'cr':cc(m.net_pct,15,25)}">${m.net_pct}%</span></td>
-    <td><span class="chip ${m.cog_pct<=35?'cg':m.cog_pct<=39?'ca':'cr'}">${m.cog_pct}%</span></td>
-    <td><span class="chip ${m.col_pct<=16?'cg':m.col_pct<=21?'ca':'cr'}">${m.col_pct}%</span></td>
-    <td><span class="chip ${m.sa_pct<=14?'cg':m.sa_pct<=20?'ca':'cr'}">${m.sa_pct}%</span></td>
-    <td><span class="chip ${m.rent_pct<=8?'cg':m.rent_pct<=15?'ca':'cr'}">${m.rent_pct}%</span></td>
-    <td><span class="chip ${m.elec_pct<=3?'cg':m.elec_pct<=6?'ca':'cr'}">${m.elec_pct}%</span></td>
+  document.getElementById('mgBody').innerHTML=list.map((m,i)=>`
+    ${i+1}</td>
+    ${m.name}</strong></td>
+    ${m.codes.join(', ')}</td>
+    ${fM(m.sales)}</td>
+    ${m.gp_pct}%</span></td>
+    ${m.op_profit_pct}%</span></td>
+    ${m.net_pct}%</span></td>
+    ${m.cog_pct}%</span></td>
+    ${m.col_pct}%</span></td>
+    ${m.sa_pct}%</span></td>
+    ${m.rent_pct}%</span></td>
+    ${m.elec_pct}%</span></td>
   </tr>`).join('');
 }
 function mgSortBy(col){const el=document.getElementById('mgSort'),de=document.getElementById('mgDir');if(el.value===col)de.value=de.value==='desc'?'asc':'desc';else{el.value=col;de.value='desc';}renderMgr();}
@@ -749,20 +747,20 @@ function mgSortBy(col){const el=document.getElementById('mgSort'),de=document.ge
 function renderMgZone(){
   const z=document.getElementById('mgZone').value, sk=document.getElementById('mgZoneSort').value;
   const brs=[...RAW.filter(b=>MGR[z]?.includes(b.code))].sort((a,b)=>b[sk]-a[sk]);
-  document.getElementById('mgZoneTable').innerHTML=`<table><thead><tr>
-    <th>#</th><th>สาขา</th><th>Sales</th><th>GP%</th><th>Op%</th><th>Net%</th><th>COG%</th><th>COL%</th><th>S&A%</th><th>ค่าเช่า%</th><th>ค่าไฟ%</th>
-  </tr></thead><tbody>${brs.map((b,i)=>`<tr>
-    <td><div class="rnum ${i===0?'r1':i===1?'r2':i===2?'r3':'rnn'}">${i+1}</div></td>
-    <td><div class="tname">${b.name}</div><div class="tcode">${b.code}</div></td>
-    <td class="tmono">${fMx(b.sales)}</td>
-    <td><span class="chip ${cc(b.gp_pct,62,65)}">${b.gp_pct}%</span></td>
-    <td><span class="chip ${cc(b.op_profit_pct,20,30)}">${b.op_profit_pct}%</span></td>
-    <td><span class="chip ${b.net_pct<0?'cr':cc(b.net_pct,15,25)}">${b.net_pct}%</span></td>
-    <td><span class="chip ${b.cog_pct<=35?'cg':b.cog_pct<=39?'ca':'cr'}">${b.cog_pct}%</span></td>
-    <td><span class="chip ${b.col_pct<=16?'cg':b.col_pct<=21?'ca':'cr'}">${b.col_pct}%</span></td>
-    <td><span class="chip ${b.sa_pct<=14?'cg':b.sa_pct<=20?'ca':'cr'}">${b.sa_pct}%</span></td>
-    <td><span class="chip ${b.rent_pct<=8?'cg':b.rent_pct<=15?'ca':'cr'}">${b.rent_pct}%</span></td>
-    <td><span class="chip ${b.elec_pct<=3?'cg':b.elec_pct<=6?'ca':'cr'}">${b.elec_pct}%</span></td>
+  document.getElementById('mgZoneTable').innerHTML=`
+    #</th>สาขา</th>Sales</th>GP%</th>Op%</th>Net%</th>COG%</th>COL%</th>S&A%</th>ค่าเช่า%</th>ค่าไฟ%</th>
+  </tr></thead>${brs.map((b,i)=>`
+    ${i+1}</td>
+    ${b.name}${b.code}</td>
+    ${fMx(b.sales)}</td>
+    ${b.gp_pct}%</span></td>
+    ${b.op_profit_pct}%</span></td>
+    ${b.net_pct}%</span></td>
+    ${b.cog_pct}%</span></td>
+    ${b.col_pct}%</span></td>
+    ${b.sa_pct}%</span></td>
+    ${b.rent_pct}%</span></td>
+    ${b.elec_pct}%</span></td>
   </tr>`).join('')}</tbody></table>`;
 }
 
@@ -822,8 +820,8 @@ function buildStationDD(stations){
   const cur = document.getElementById('icStationChips')?.dataset.active||'all';
   const activeSet = cur==='all' ? new Set(stations) : new Set(cur.split('|'));
   list.innerHTML = stations.map(s=>`
-    <label>
-      <input type="checkbox" value="${s.replace(/"/g,'&quot;')}" ${activeSet.has(s)?'checked':''} onchange="stItemChange()">
+    
+      
       ${s}
     </label>`).join('');
   document.getElementById('icStAll').checked = activeSet.size===stations.length;
@@ -921,12 +919,12 @@ function renderIC(){
   const cats=[['F&B','#22c55e','#f0fdf4'],['Packaging','#3b82f6','#eff4ff'],['Non-food','#f59e0b','#fffbeb'],['Other','#9aa0ad','#f1f5f9']];
   document.getElementById('icKPI').innerHTML=cats.map(([cat,color,bg])=>{
     const v=sm[cat]||{amt:0,pct:0};
-    return `<div class="kpi"><div class="kpib" style="background:${color}"></div>
-      <div class="kpil">${cat}</div>
-      <div class="kpiv" style="font-size:1.2rem">฿${(v.amt/1e3).toFixed(0)}K</div>
-      <div class="kpis">฿${v.amt.toLocaleString('en')}</div>
-      <span class="kchip" style="background:${bg};color:${color}">${v.pct}% of Sales</span>
-    </div>`;
+    return `
+      ${cat}
+      ฿${(v.amt/1e3).toFixed(0)}K
+      ฿${v.amt.toLocaleString('en')}
+      ${v.pct}% of Sales</span>
+    `;
   }).join('');
 
   // Donut
@@ -1156,7 +1154,7 @@ function renderICTable(){
       const label   = monthLabels[mk];
       const subLabel= showPct ? '%' : 'qty';
       addTh(
-        `<div style="font-weight:700">${label}</div><div style="font-weight:400;font-size:.6rem;opacity:.7">${subLabel}</div>`,
+        `${label}${subLabel}`,
         `text-align:right;font-size:.68rem;white-space:nowrap;width:68px;color:${hasData?'#7c3aed':'#cbd5e1'}`
       );
     });
@@ -1172,37 +1170,37 @@ function renderICTable(){
     let dataCols = '';
     if(viewMode === 'all'){
       const midVal = icValueMode==='qty'
-        ? `<td class="tmono" style="text-align:right;color:#7c3aed;font-weight:600">${it[4]?fmtQty(it[4]):'—'}</td>`
-        : `<td class="tmono" style="text-align:right;font-weight:600">฿${it[3].toLocaleString('en')}</td>`;
+        ? `${it[4]?fmtQty(it[4]):'—'}</td>`
+        : `฿${it[3].toLocaleString('en')}</td>`;
       dataCols = `
-        <td class="tmono" style="text-align:right;color:var(--t2)">${it[5]?'฿'+it[5].toLocaleString('en'):'—'}</td>
+        ${it[5]?'฿'+it[5].toLocaleString('en'):'—'}</td>
         ${midVal}
-        <td class="tmono" style="text-align:right;color:${it[2]==='F&B'?'#16a34a':it[2]==='Packaging'?'#2563eb':'#d97706'};font-weight:600">${pct}%</td>`;
+        ${pct}%</td>`;
     } else {
       dataCols = allTwelve.map(mk=>{
         const md    = monthData[mk];
         const entry = md.map[it[0]];
         let val;
         if(!md.hasData){
-          val = `<span style="color:#e2e8f0">·</span>`;
+          val = `·</span>`;
         } else if(!entry){
-          val = `<span style="color:var(--t3)">—</span>`;
+          val = `—</span>`;
         } else if(showPct){
-          val = `<span style="color:#7c3aed;font-weight:500">${(entry.cost/md.sales*100).toFixed(1)}%</span>`;
+          val = `${(entry.cost/md.sales*100).toFixed(1)}%</span>`;
         } else {
-          val = `<span style="color:#7c3aed;font-weight:500">${fmtQty(entry.qty)}</span>`;
+          val = `${fmtQty(entry.qty)}</span>`;
         }
-        return `<td class="tmono" style="text-align:right;padding:6px 10px;width:68px">${val}</td>`;
+        return `${val}</td>`;
       }).join('');
     }
 
-    return `<tr>
-      <td style="color:var(--t3);font-size:.72rem">${i+1}</td>
-      <td><div style="font-size:.82rem;font-weight:500">${it[1]}</div><div style="font-size:.68rem;color:var(--t3);font-family:monospace">${it[0]}</div></td>
-      <td><span class="chip ${bColors[it[2]]||'ct'}" style="font-size:.69rem">${it[2]}</span></td>
-      <td style="font-size:.74rem;color:var(--t2)">${it[6]||'—'}</td>
+    return `
+      ${i+1}</td>
+      ${it[1]}${it[0]}</td>
+      ${it[2]}</span></td>
+      ${it[6]||'—'}</td>
       ${dataCols}
-      <td style="padding:8px 11px"><div style="height:6px;border-radius:3px;background:${barColor};width:${bw}%;max-width:100px;opacity:.6"></div></td>
+      </td>
     </tr>`;
   }).join('');
 }
@@ -1306,12 +1304,12 @@ function renderMXBranch(){
   // Table
   const metrics=['sales','gp_pct','op_profit_pct','net_pct','cog_pct','col_pct','sa_pct','rent_pct','elec_pct'];
   const mLabels=['Sales','GP%','Op%','Net%','COG%','COL%','S&A%','ค่าเช่า%','ค่าไฟ%'];
-  document.getElementById('mxTHead').innerHTML='<th>Metric</th>'+months.map(m=>`<th>${MONTHS[m].label}</th>`).join('');
+  document.getElementById('mxTHead').innerHTML='Metric</th>'+months.map(m=>`${MONTHS[m].label}</th>`).join('');
   document.getElementById('mxTBody').innerHTML=metrics.map((mk,ri)=>{
     const isPctRow=mk!=='sales';
     const vals=months.map(m=>{const b=MONTHS[m].raw.find(x=>x.code===code); return b?b[mk]:null;});
     const cells=vals.map((v,ci)=>{
-      if(v===null) return '<td style="color:var(--t3)">—</td>';
+      if(v===null) return '—</td>';
       const disp=isPctRow?`${v.toFixed(1)}%`:`฿${(v/1e6).toFixed(2)}M`;
       // color change vs prev month
       const prev=ci>0?vals[ci-1]:null;
@@ -1322,11 +1320,11 @@ function renderMXBranch(){
         color=delta===0?'':((good&&delta>0)||(!good&&delta<0))?'color:#16a34a':'color:#dc2626';
         const arrow=delta>0?'▲':'▼';
         const chg=isPctRow?`${Math.abs(delta).toFixed(1)}%`:`฿${(Math.abs(delta)/1e6).toFixed(2)}M`;
-        return `<td class="tmono" style="${color}">${disp} <span style="font-size:.68rem">${arrow}${chg}</span></td>`;
+        return `${disp} ${arrow}${chg}</span></td>`;
       }
-      return `<td class="tmono">${disp}</td>`;
+      return `${disp}</td>`;
     }).join('');
-    return `<tr><td style="font-weight:600;font-size:.8rem">${mLabels[ri]}</td>${cells}</tr>`;
+    return `${mLabels[ri]}</td>${cells}</tr>`;
   }).join('');
 }
 
@@ -1359,13 +1357,13 @@ function renderMXKPI(){
     const r=MONTHS[m].raw, s=r.reduce((a,b)=>a+b.sales,0)||1;
     const net=r.reduce((a,b)=>a+b.net_profit,0)/s*100;
     const gp=r.reduce((a,b)=>a+b.gp1,0)/s*100;
-    return `<div class="kpi"><div class="kpib" style="background:${C.b}"></div>
-      <div class="kpil">${MONTHS[m].label}</div>
-      <div class="kpiv">฿${(s/1e6).toFixed(1)}M</div>
-      <div class="kpis">${r.length} สาขา</div>
-      <span class="kchip ${net>=20?'cg':net>=10?'ca':'cr'}">Net ${net.toFixed(1)}%</span>
-      <span class="kchip cb" style="margin-left:4px">GP ${gp.toFixed(1)}%</span>
-    </div>`;
+    return `
+      ${MONTHS[m].label}
+      ฿${(s/1e6).toFixed(1)}M
+      ${r.length} สาขา
+      =20?'cg':net>=10?'ca':'cr'}">Net ${net.toFixed(1)}%</span>
+      GP ${gp.toFixed(1)}%</span>
+    `;
   }).join('');
 }
 
@@ -1537,7 +1535,7 @@ function initICX(){
     [...stations].sort().forEach(s => {
       const lbl = document.createElement('label');
       lbl.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 14px;cursor:pointer;font-size:.8rem;white-space:nowrap';
-      lbl.innerHTML = `<input type="checkbox" class="icxStChk" value="${s}" checked onchange="onStationChange()"> ${s}`;
+      lbl.innerHTML = ` ${s}`;
       stList.appendChild(lbl);
     });
   }
@@ -1603,16 +1601,16 @@ function renderICX(){
 
   // Build header
   const thStyle = 'text-align:center;padding:4px 8px;font-size:.65rem;white-space:nowrap;min-width:60px;max-width:80px';
-  let headHtml = '<tr style="position:sticky;top:0;background:#f8fafc">';
-  headHtml += '<th style="width:30%;padding:6px 10px;text-align:left;font-size:.7rem">รายการ</th>';
-  headHtml += '<th style="padding:6px 8px;text-align:left;font-size:.7rem;color:var(--t3)">Station</th>';
+  let headHtml = '';
+  headHtml += 'รายการ</th>';
+  headHtml += 'Station</th>';
   branches.forEach(br => {
-    headHtml += `<th style="${thStyle}">
-      <div style="font-weight:700">${br.code}</div>
-      <div style="font-size:.58rem;color:var(--t2);font-weight:400">${(br.name||'').substring(0,10)}</div>
+    headHtml += `
+      ${br.code}
+      ${(br.name||'').substring(0,10)}
     </th>`;
   });
-  headHtml += `<th style="${thStyle};background:#f0f7ff;color:var(--blue);font-weight:700">เฉลี่ย</th>`;
+  headHtml += `เฉลี่ย</th>`;
   headHtml += '</tr>';
   document.getElementById('icxHead').innerHTML = headHtml;
 
@@ -1622,7 +1620,7 @@ function renderICX(){
   items.forEach(([code, item]) => {
     if(item.station !== curStation){
       curStation = item.station;
-      bodyHtml += `<tr><td colspan="${branches.length+3}" style="padding:5px 10px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:#f1f5f9;color:var(--blue);border-top:2px solid var(--bd)">${curStation||'ไม่ระบุ'}</td></tr>`;
+      bodyHtml += `${curStation||'ไม่ระบุ'}</td></tr>`;
     }
     const vals = branches.map(br => item.byBranch[br.code]?.amt||0).filter(v=>v>0);
     const maxVal = vals.length ? Math.max(...vals) : 1;
@@ -1637,11 +1635,11 @@ function renderICX(){
       else { const v=avail.reduce((s,br)=>s+(item.byBranch[br.code]?.qty||0),0)/avail.length; avgFv=v.toFixed(1); }
     }
 
-    bodyHtml += `<tr><td style="padding:4px 10px;font-size:.73rem">${item.name.substring(0,40)}</td>`;
-    bodyHtml += `<td style="padding:4px 6px;font-size:.65rem;color:var(--t3);white-space:nowrap">${item.station||'—'}</td>`;
+    bodyHtml += `${item.name.substring(0,40)}</td>`;
+    bodyHtml += `${item.station||'—'}</td>`;
     branches.forEach(br => {
       const bdata = item.byBranch[br.code];
-      if(!bdata || bdata.amt === 0){ bodyHtml += `<td style="text-align:${align};padding:4px 6px;color:var(--t3)">—</td>`; return; }
+      if(!bdata || bdata.amt === 0){ bodyHtml += `—</td>`; return; }
       const heatBase = icxMode==='qty' ? (bdata.qty||0) : bdata.amt;
       const heatMax  = icxMode==='qty' ? maxQty : maxVal;
       const heat = Math.round((heatBase/heatMax)*80);
@@ -1651,9 +1649,9 @@ function renderICX(){
       if(icxMode==='thb')      fv = '฿'+bdata.amt.toLocaleString('en',{maximumFractionDigits:0});
       else if(icxMode==='pct') fv = bdata.pct+'%';
       else                     fv = (bdata.qty||0).toLocaleString('en',{maximumFractionDigits:0});
-      bodyHtml += `<td style="text-align:${align};padding:4px 6px;font-size:.72rem;background:${bgColor};color:${textColor}">${fv}</td>`;
+      bodyHtml += `${fv}</td>`;
     });
-    bodyHtml += `<td style="text-align:${align};padding:4px 8px;font-size:.72rem;font-weight:700;background:#f0f7ff;color:var(--blue)">${avgFv}</td>`;
+    bodyHtml += `${avgFv}</td>`;
     bodyHtml += '</tr>';
   });
   document.getElementById('icxBody').innerHTML = bodyHtml;
@@ -1700,13 +1698,13 @@ function renderICXMonth(){
   // Header
   const thS = 'text-align:center;padding:4px 8px;font-size:.65rem;white-space:nowrap;min-width:58px';
   const brName = ACTIVE.find(b=>b.code===code)?.name || code;
-  let headHtml = `<tr style="position:sticky;top:0;background:#f8fafc">
-    <th style="width:30%;padding:6px 10px;text-align:left;font-size:.7rem">รายการ (${code} ${brName})</th>
-    <th style="padding:6px 8px;text-align:left;font-size:.7rem;color:var(--t3)">Station</th>`;
+  let headHtml = `
+    รายการ (${code} ${brName})</th>
+    Station</th>`;
   ALL_MONTHS.forEach(([mk,ml]) => {
-    headHtml += `<th style="${thS};color:${MONTHS[mk]?'var(--t1)':'var(--t3)'}">${ml}</th>`;
+    headHtml += `${ml}</th>`;
   });
-  headHtml += `<th style="${thS};background:#f0f7ff;color:var(--blue);font-weight:700">${icxMode==='thb'?'รวม':'เฉลี่ย'}</th></tr>`;
+  headHtml += `${icxMode==='thb'?'รวม':'เฉลี่ย'}</th></tr>`;
   document.getElementById('icxHead').innerHTML = headHtml;
 
   // Body
@@ -1715,7 +1713,7 @@ function renderICXMonth(){
   items.forEach(([icode, item]) => {
     if(item.station !== curStation){
       curStation = item.station;
-      bodyHtml += `<tr><td colspan="15" style="padding:5px 10px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:#f1f5f9;color:var(--blue);border-top:2px solid var(--bd)">${curStation||'ไม่ระบุ'}</td></tr>`;
+      bodyHtml += `${curStation||'ไม่ระบุ'}</td></tr>`;
     }
 
     // Max for heatmap
@@ -1734,11 +1732,11 @@ function renderICXMonth(){
       else totalFv=(sumQty/availM.length).toFixed(1);
     }
 
-    bodyHtml += `<tr><td style="padding:4px 10px;font-size:.73rem">${item.name.substring(0,40)}</td>`;
-    bodyHtml += `<td style="padding:4px 6px;font-size:.65rem;color:var(--t3);white-space:nowrap">${item.station||'—'}</td>`;
+    bodyHtml += `${item.name.substring(0,40)}</td>`;
+    bodyHtml += `${item.station||'—'}</td>`;
     ALL_MONTHS.forEach(([mk]) => {
       const d = item.byMonth[mk];
-      if(!d || d.amt===0){ bodyHtml += `<td style="text-align:${align};padding:4px 6px;color:var(--t3)">—</td>`; return; }
+      if(!d || d.amt===0){ bodyHtml += `—</td>`; return; }
       const heatBase = icxMode==='qty' ? d.qty : d.amt;
       const heatMax  = icxMode==='qty' ? maxQty : maxVal;
       const heat = Math.round((heatBase/heatMax)*80);
@@ -1748,15 +1746,21 @@ function renderICXMonth(){
       if(icxMode==='thb')      fv='฿'+d.amt.toLocaleString('en',{maximumFractionDigits:0});
       else if(icxMode==='pct') fv=d.pct+'%';
       else                     fv=(d.qty||0).toLocaleString('en',{maximumFractionDigits:0});
-      bodyHtml += `<td style="text-align:${align};padding:4px 6px;font-size:.72rem;background:${bg};color:${tc}">${fv}</td>`;
+      bodyHtml += `${fv}</td>`;
     });
-    bodyHtml += `<td style="text-align:${align};padding:4px 8px;font-size:.72rem;font-weight:700;background:#f0f7ff;color:var(--blue)">${totalFv}</td></tr>`;
+    bodyHtml += `${totalFv}</td></tr>`;
   });
   document.getElementById('icxBody').innerHTML = bodyHtml;
 }
 
 /* ── INIT deferred to after login ── */
 function initDashboard(){} // stub — rendering done in startLoad
+
+
+
+
+
+
 
 
 document.addEventListener('DOMContentLoaded', function(){
